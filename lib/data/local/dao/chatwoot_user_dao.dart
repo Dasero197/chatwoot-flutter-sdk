@@ -1,5 +1,5 @@
 import 'package:chatwoot_sdk/data/local/entity/chatwoot_user.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce/hive.dart';
 
 abstract class ChatwootUserDao {
   Future<void> saveUser(ChatwootUser user);
@@ -20,13 +20,17 @@ class PersistedChatwootUserDao extends ChatwootUserDao {
 
   final String _clientInstanceKey;
 
-  PersistedChatwootUserDao(this._box, this._clientInstanceIdToUserIdentifierBox,
-      this._clientInstanceKey);
+  PersistedChatwootUserDao(
+    this._box,
+    this._clientInstanceIdToUserIdentifierBox,
+    this._clientInstanceKey,
+  );
 
   @override
   Future<void> deleteUser() async {
-    final userIdentifier =
-        _clientInstanceIdToUserIdentifierBox.get(_clientInstanceKey);
+    final userIdentifier = _clientInstanceIdToUserIdentifierBox.get(
+      _clientInstanceKey,
+    );
     await _clientInstanceIdToUserIdentifierBox.delete(_clientInstanceKey);
     await _box.delete(userIdentifier);
   }
@@ -34,7 +38,9 @@ class PersistedChatwootUserDao extends ChatwootUserDao {
   @override
   Future<void> saveUser(ChatwootUser user) async {
     await _clientInstanceIdToUserIdentifierBox.put(
-        _clientInstanceKey, user.identifier.toString());
+      _clientInstanceKey,
+      user.identifier.toString(),
+    );
     await _box.put(user.identifier, user);
   }
 
@@ -43,8 +49,9 @@ class PersistedChatwootUserDao extends ChatwootUserDao {
     if (_box.values.length == 0) {
       return null;
     }
-    final userIdentifier =
-        _clientInstanceIdToUserIdentifierBox.get(_clientInstanceKey);
+    final userIdentifier = _clientInstanceIdToUserIdentifierBox.get(
+      _clientInstanceKey,
+    );
 
     return _box.get(userIdentifier);
   }
@@ -61,7 +68,8 @@ class PersistedChatwootUserDao extends ChatwootUserDao {
   static Future<void> openDB() async {
     await Hive.openBox<ChatwootUser>(ChatwootUserBoxNames.USERS.toString());
     await Hive.openBox<String>(
-        ChatwootUserBoxNames.CLIENT_INSTANCE_TO_USER.toString());
+      ChatwootUserBoxNames.CLIENT_INSTANCE_TO_USER.toString(),
+    );
   }
 }
 

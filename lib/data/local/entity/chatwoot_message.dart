@@ -1,6 +1,6 @@
 import 'package:chatwoot_sdk/data/remote/responses/chatwoot_event.dart';
 import 'package:equatable/equatable.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../local_storage.dart';
@@ -60,16 +60,17 @@ class ChatwootMessage extends Equatable {
   ///checks if message belongs to contact making the request
   bool get isMine => messageType != 1;
 
-  ChatwootMessage(
-      {required this.id,
-      required this.content,
-      required this.messageType,
-      required this.contentType,
-      required this.contentAttributes,
-      required this.createdAt,
-      required this.conversationId,
-      required this.attachments,
-      required this.sender});
+  ChatwootMessage({
+    required this.id,
+    required this.content,
+    required this.messageType,
+    required this.contentType,
+    required this.contentAttributes,
+    required this.createdAt,
+    required this.conversationId,
+    required this.attachments,
+    required this.sender,
+  });
 
   factory ChatwootMessage.fromJson(Map<String, dynamic> json) =>
       _$ChatwootMessageFromJson(json);
@@ -78,16 +79,16 @@ class ChatwootMessage extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        content,
-        messageType,
-        contentType,
-        contentAttributes,
-        createdAt,
-        conversationId,
-        attachments,
-        sender
-      ];
+    id,
+    content,
+    messageType,
+    contentType,
+    contentAttributes,
+    createdAt,
+    conversationId,
+    attachments,
+    sender,
+  ];
 }
 
 int idFromJson(value) {

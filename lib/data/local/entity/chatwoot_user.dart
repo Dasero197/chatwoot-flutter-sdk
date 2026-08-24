@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../local_storage.dart';
@@ -40,17 +40,24 @@ class ChatwootUser extends Equatable {
   @HiveField(5)
   final dynamic customAttributes;
 
-  ChatwootUser(
-      {this.identifier,
-      this.identifierHash,
-      this.name,
-      this.email,
-      this.avatarUrl,
-      this.customAttributes});
+  ChatwootUser({
+    this.identifier,
+    this.identifierHash,
+    this.name,
+    this.email,
+    this.avatarUrl,
+    this.customAttributes,
+  });
 
   @override
-  List<Object?> get props =>
-      [identifier, identifierHash, name, email, avatarUrl, customAttributes];
+  List<Object?> get props => [
+    identifier,
+    identifierHash,
+    name,
+    email,
+    avatarUrl,
+    customAttributes,
+  ];
 
   factory ChatwootUser.fromJson(Map<String, dynamic> json) =>
       _$ChatwootUserFromJson(json);

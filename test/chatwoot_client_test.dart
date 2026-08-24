@@ -21,52 +21,55 @@ void main() {
     final testBaseUrl = "https://testbaseurl.com";
     late ProviderContainer mockProviderContainer;
     final mockLocalStorage = MockLocalStorage();
-    final mockLocalStorageProvider = Provider.family((ref,params)=>mockLocalStorage);
     final mockRepository = MockChatwootRepository();
-    final mockRepositoryProvider = Provider.family((ref,params)=>mockRepository);
 
     final testUser = ChatwootUser(
-        identifier: "identifier",
-        identifierHash: "identifierHash",
-        name: "name",
-        email: "email",
-        avatarUrl: "avatarUrl",
-        customAttributes: {});
+      identifier: "identifier",
+      identifierHash: "identifierHash",
+      name: "name",
+      email: "email",
+      avatarUrl: "avatarUrl",
+      customAttributes: {},
+    );
     final testClientInstanceKey = ChatwootClient.getClientInstanceKey(
-        baseUrl: testBaseUrl,
-        inboxIdentifier: testInboxIdentifier,
-        userIdentifier: testUser.identifier);
+      baseUrl: testBaseUrl,
+      inboxIdentifier: testInboxIdentifier,
+      userIdentifier: testUser.identifier,
+    );
 
     setUp(() async {
       when(mockRepository.initialize(testUser))
           .thenAnswer((realInvocation) => Future.microtask(() {}));
       mockProviderContainer = ProviderContainer(
-          overrides:[
-            localStorageProvider
-                .overrideWithProvider(mockLocalStorageProvider),
-            chatwootRepositoryProvider
-                .overrideWithProvider(mockRepositoryProvider)
-          ]
+        overrides: [
+          localStorageProvider.overrideWith((ref, params) => mockLocalStorage),
+          chatwootRepositoryProvider.overrideWith(
+            (ref, params) => mockRepository,
+          ),
+        ],
       );
       ChatwootClient.providerContainerMap.update(
-          testClientInstanceKey, (_) => mockProviderContainer,
-          ifAbsent: () => mockProviderContainer);
+        testClientInstanceKey,
+        (_) => mockProviderContainer,
+        ifAbsent: () => mockProviderContainer,
+      );
       ChatwootClient.providerContainerMap.update(
-          "all", (_) => mockProviderContainer,
-          ifAbsent: () => mockProviderContainer);
+        "all",
+        (_) => mockProviderContainer,
+        ifAbsent: () => mockProviderContainer,
+      );
 
       client = await ChatwootClient.create(
-          baseUrl: testBaseUrl,
-          inboxIdentifier: testInboxIdentifier,
-          user: testUser,
-          enablePersistence: false);
+        baseUrl: testBaseUrl,
+        inboxIdentifier: testInboxIdentifier,
+        user: testUser,
+        enablePersistence: false,
+      );
 
       PathProviderPlatform.instance = MockPathProviderPlatform();
     });
 
-    test(
-        'Given all persisted data is successfully cleared when a clearAllData is called, then all local storage data should be cleared',
-        () async {
+    test('Given all persisted data is successfully cleared when a clearAllData is called, then all local storage data should be cleared', () async {
       //GIVEN
       when(mockLocalStorage.clearAll())
           .thenAnswer((_) => Future.microtask(() {}));
@@ -80,9 +83,7 @@ void main() {
       verify(mockLocalStorage.clearAll());
     });
 
-    test(
-        'Given client persisted data is successfully cleared when a clearData is called, then clients local storage data should be cleared',
-        () async {
+    test('Given client persisted data is successfully cleared when a clearData is called, then clients local storage data should be cleared', () async {
       //GIVEN
       when(mockLocalStorage.clear()).thenAnswer((_) => Future.microtask(() {}));
       when(mockLocalStorage.dispose())
@@ -90,18 +91,17 @@ void main() {
 
       //WHEN
       await ChatwootClient.clearData(
-          baseUrl: testBaseUrl,
-          inboxIdentifier: testInboxIdentifier,
-          userIdentifier: testUser.identifier);
+        baseUrl: testBaseUrl,
+        inboxIdentifier: testInboxIdentifier,
+        userIdentifier: testUser.identifier,
+      );
 
       //THEN
       verify(mockLocalStorage.clear());
       verify(mockLocalStorage.dispose());
     });
 
-    test(
-        'Given client instance persisted data is successfully cleared when a clearClientData is called, then clients local storage data should be cleared',
-        () async {
+    test('Given client instance persisted data is successfully cleared when a clearClientData is called, then clients local storage data should be cleared', () async {
       //GIVEN
       when(mockLocalStorage.clear()).thenAnswer((_) => Future.microtask(() {}));
       when(mockLocalStorage.dispose())
@@ -115,9 +115,7 @@ void main() {
       verifyNever(mockLocalStorage.dispose());
     });
 
-    test(
-        'Given client instance is successfully disposed when a dispose is called, then repository should be disposed',
-        () async {
+    test('Given client instance is successfully disposed when a dispose is called, then repository should be disposed', () async {
       //GIVEN
       when(mockLocalStorage.clear()).thenAnswer((_) => Future.microtask(() {}));
       when(mockLocalStorage.dispose())
@@ -128,13 +126,13 @@ void main() {
 
       //THEN
       verify(mockRepository.dispose());
-      expect(ChatwootClient.providerContainerMap[testClientInstanceKey],
-          equals(null));
+      expect(
+        ChatwootClient.providerContainerMap[testClientInstanceKey],
+        equals(null),
+      );
     });
 
-    test(
-        'Given message sends successfully disposed when a sendMessage is called, then repository should be called',
-        () async {
+    test('Given message sends successfully disposed when a sendMessage is called, then repository should be called', () async {
       //GIVEN
       when(mockRepository.sendMessage(any))
           .thenAnswer((_) => Future.microtask(() {}));
@@ -146,9 +144,7 @@ void main() {
       verify(mockRepository.sendMessage(any));
     });
 
-    test(
-        'Given message sends successfully disposed when a sendMessage is called, then repository should be called',
-        () async {
+    test('Given message sends successfully disposed when a sendMessage is called, then repository should be called', () async {
       //GIVEN
       when(mockRepository.sendMessage(any))
           .thenAnswer((_) => Future.microtask(() {}));
@@ -160,9 +156,7 @@ void main() {
       verify(mockRepository.sendMessage(any));
     });
 
-    test(
-        'Given messages load successfully when a loadMessages is called, then repository should be called',
-        () async {
+    test('Given messages load successfully when a loadMessages is called, then repository should be called', () async {
       //GIVEN
       when(mockRepository.getMessages())
           .thenAnswer((_) => Future.microtask(() {}));
@@ -177,9 +171,7 @@ void main() {
       verify(mockRepository.getMessages());
     });
 
-    test(
-        'Given action is sent successfully when a sendAction is called, then repository should be called',
-        () async {
+    test('Given action is sent successfully when a sendAction is called, then repository should be called', () async {
       //GIVEN
       when(mockRepository.sendAction(any))
           .thenAnswer((_) => Future.microtask(() {}));
@@ -191,17 +183,16 @@ void main() {
       verify(mockRepository.sendAction(ChatwootActionType.update_presence));
     });
 
-    test(
-        'Given client is successfully initialized when a create is called without persistence enabled, then repository should be initialized',
-        () async {
+    test('Given client is successfully initialized when a create is called without persistence enabled, then repository should be initialized', () async {
       //GIVEN
 
       //WHEN
       final result = await ChatwootClient.create(
-          baseUrl: testBaseUrl,
-          inboxIdentifier: testInboxIdentifier,
-          user: testUser,
-          enablePersistence: false);
+        baseUrl: testBaseUrl,
+        inboxIdentifier: testInboxIdentifier,
+        user: testUser,
+        enablePersistence: false,
+      );
 
       //THEN
       verify(mockRepository.initialize(testUser));
@@ -209,17 +200,16 @@ void main() {
       expect(result.inboxIdentifier, equals(testInboxIdentifier));
     });
 
-    test(
-        'Given client is successfully initialized when a create is called with persistence enabled, then repository should be initialized',
-        () async {
+    test('Given client is successfully initialized when a create is called with persistence enabled, then repository should be initialized', () async {
       //GIVEN
 
       //WHEN
       final result = await ChatwootClient.create(
-          baseUrl: testBaseUrl,
-          inboxIdentifier: testInboxIdentifier,
-          user: testUser,
-          enablePersistence: true);
+        baseUrl: testBaseUrl,
+        inboxIdentifier: testInboxIdentifier,
+        user: testUser,
+        enablePersistence: true,
+      );
 
       //THEN
       verify(mockRepository.initialize(testUser));

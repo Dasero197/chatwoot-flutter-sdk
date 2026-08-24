@@ -4,7 +4,7 @@ import 'package:chatwoot_sdk/data/local/dao/chatwoot_messages_dao.dart';
 import 'package:chatwoot_sdk/data/local/entity/chatwoot_message.dart';
 import 'package:chatwoot_sdk/data/remote/responses/chatwoot_event.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce/hive.dart';
 
 import '../../../utils/test_resources_util.dart';
 
@@ -26,26 +26,29 @@ void main() {
           ..registerAdapter(ChatwootEventMessageUserAdapter());
 
         testMessage = ChatwootMessage.fromJson(
-            await TestResourceUtil.readJsonResource(fileName: "message"));
+          await TestResourceUtil.readJsonResource(fileName: "message"),
+        );
       });
     });
 
     setUp(() {
       return Future(() async {
-        mockMessageBox =
-            await Hive.openBox(ChatwootMessagesBoxNames.MESSAGES.toString());
+        mockMessageBox = await Hive.openBox(
+          ChatwootMessagesBoxNames.MESSAGES.toString(),
+        );
         mockClientInstanceKeyToMessageBox = await Hive.openBox(
-            ChatwootMessagesBoxNames.MESSAGES_TO_CLIENT_INSTANCE_KEY
-                .toString());
+          ChatwootMessagesBoxNames.MESSAGES_TO_CLIENT_INSTANCE_KEY.toString(),
+        );
 
-        dao = PersistedChatwootMessagesDao(mockMessageBox,
-            mockClientInstanceKeyToMessageBox, testClientInstanceKey);
+        dao = PersistedChatwootMessagesDao(
+          mockMessageBox,
+          mockClientInstanceKeyToMessageBox,
+          testClientInstanceKey,
+        );
       });
     });
 
-    test(
-        'Given message is successfully deleted when deleteMessage is called, then getMessage should return null',
-        () async {
+    test('Given message is successfully deleted when deleteMessage is called, then getMessage should return null', () async {
       //GIVEN
       await dao.saveMessage(testMessage);
 
@@ -56,9 +59,7 @@ void main() {
       expect(dao.getMessage(testMessage.id), null);
     });
 
-    test(
-        'Given message is successfully save when saveMessage is called, then getMessage should return saved message',
-        () async {
+    test('Given message is successfully save when saveMessage is called, then getMessage should return saved message', () async {
       //WHEN
       await dao.saveMessage(testMessage);
 
@@ -66,9 +67,7 @@ void main() {
       expect(dao.getMessage(testMessage.id), testMessage);
     });
 
-    test(
-        'Given messages are successfully saved when saveMessages is called, then getMessages should return saved messages',
-        () async {
+    test('Given messages are successfully saved when saveMessages is called, then getMessages should return saved messages', () async {
       final messages = [testMessage];
 
       //WHEN
@@ -78,9 +77,7 @@ void main() {
       expect(dao.getMessages(), messages);
     });
 
-    test(
-        'Given message is successfully retrieved when getMessage is called, then retrieved message should not be null',
-        () async {
+    test('Given message is successfully retrieved when getMessage is called, then retrieved message should not be null', () async {
       //GIVEN
       await dao.saveMessage(testMessage);
 
@@ -91,9 +88,7 @@ void main() {
       expect(retrievedMessage, testMessage);
     });
 
-    test(
-        'Given messages exist in database when getMessages is called, then retrieved messages should not be empty',
-        () async {
+    test('Given messages exist in database when getMessages is called, then retrieved messages should not be empty', () async {
       //GIVEN
       await dao.saveMessage(testMessage);
 
@@ -105,9 +100,7 @@ void main() {
       expect(retrievedMessages[0], testMessage);
     });
 
-    test(
-        'Given messages do not exist in database when getMessages is called, then retrieved messages should be empty',
-        () async {
+    test('Given messages do not exist in database when getMessages is called, then retrieved messages should be empty', () async {
       //GIVEN
       await dao.clear();
 
@@ -118,9 +111,7 @@ void main() {
       expect(retrievedMessages.length, 0);
     });
 
-    test(
-        'Given messages are successfully cleared when clear is called, then no message should exist in database',
-        () async {
+    test('Given messages are successfully cleared when clear is called, then no message should exist in database', () async {
       //GIVEN
       await dao.saveMessage(testMessage);
 
@@ -132,9 +123,7 @@ void main() {
       expect(retrievedMessages.length, 0);
     });
 
-    test(
-        'Given messages are successfully cleared when clearAll is called, then retrieving messages should be empty',
-        () async {
+    test('Given messages are successfully cleared when clearAll is called, then retrieving messages should be empty', () async {
       //GIVEN
       await dao.saveMessage(testMessage);
 

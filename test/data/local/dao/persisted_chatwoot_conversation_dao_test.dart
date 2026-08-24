@@ -5,7 +5,7 @@ import 'package:chatwoot_sdk/data/local/entity/chatwoot_contact.dart';
 import 'package:chatwoot_sdk/data/local/entity/chatwoot_conversation.dart';
 import 'package:chatwoot_sdk/data/local/entity/chatwoot_message.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce/hive.dart';
 
 import '../../../utils/test_resources_util.dart';
 
@@ -21,7 +21,8 @@ void main() {
     setUpAll(() {
       return Future(() async {
         testConversation = ChatwootConversation.fromJson(
-            await TestResourceUtil.readJsonResource(fileName: "conversation"));
+          await TestResourceUtil.readJsonResource(fileName: "conversation"),
+        );
 
         final hiveTestPath = Directory.current.path + '/test/hive_testing_path';
         Hive
@@ -35,19 +36,22 @@ void main() {
     setUp(() {
       return Future(() async {
         mockConversationBox = await Hive.openBox(
-            ChatwootConversationBoxNames.CONVERSATIONS.toString());
+          ChatwootConversationBoxNames.CONVERSATIONS.toString(),
+        );
         mockClientInstanceKeyToConversationBox = await Hive.openBox(
-            ChatwootConversationBoxNames.CLIENT_INSTANCE_TO_CONVERSATIONS
-                .toString());
+          ChatwootConversationBoxNames.CLIENT_INSTANCE_TO_CONVERSATIONS
+              .toString(),
+        );
 
-        dao = PersistedChatwootConversationDao(mockConversationBox,
-            mockClientInstanceKeyToConversationBox, testClientInstanceKey);
+        dao = PersistedChatwootConversationDao(
+          mockConversationBox,
+          mockClientInstanceKeyToConversationBox,
+          testClientInstanceKey,
+        );
       });
     });
 
-    test(
-        'Given conversation is successfully deleted when deleteConversation is called, then getConversation should return null',
-        () async {
+    test('Given conversation is successfully deleted when deleteConversation is called, then getConversation should return null', () async {
       //GIVEN
       await dao.saveConversation(testConversation);
 
@@ -58,9 +62,7 @@ void main() {
       expect(dao.getConversation(), null);
     });
 
-    test(
-        'Given conversation is successfully save when saveConversation is called, then getConversation should return saved conversation',
-        () async {
+    test('Given conversation is successfully save when saveConversation is called, then getConversation should return saved conversation', () async {
       //WHEN
       await dao.saveConversation(testConversation);
 
@@ -68,9 +70,7 @@ void main() {
       expect(dao.getConversation(), testConversation);
     });
 
-    test(
-        'Given conversation is successfully retrieved when getConversation is called, then retrieved conversation should not be null',
-        () async {
+    test('Given conversation is successfully retrieved when getConversation is called, then retrieved conversation should not be null', () async {
       //GIVEN
       await dao.saveConversation(testConversation);
 
@@ -81,9 +81,7 @@ void main() {
       expect(retrievedConversation, testConversation);
     });
 
-    test(
-        'Given conversations are successfully cleared when clearAll is called, then retrieving a conversation should be null',
-        () async {
+    test('Given conversations are successfully cleared when clearAll is called, then retrieving a conversation should be null', () async {
       //GIVEN
       await dao.saveConversation(testConversation);
 

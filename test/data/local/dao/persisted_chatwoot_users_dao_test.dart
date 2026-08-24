@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:chatwoot_sdk/data/local/dao/chatwoot_user_dao.dart';
 import 'package:chatwoot_sdk/data/local/entity/chatwoot_user.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce/hive.dart';
 
 void main() {
   group("Persisted Chatwoot User Dao Tests", () {
@@ -13,12 +13,13 @@ void main() {
     final testClientInstanceKey = "testKey";
 
     final testUser = ChatwootUser(
-        identifier: "identifier",
-        identifierHash: "identifierHash",
-        name: "name",
-        email: "email",
-        avatarUrl: "avatarUrl",
-        customAttributes: {});
+      identifier: "identifier",
+      identifierHash: "identifierHash",
+      name: "name",
+      email: "email",
+      avatarUrl: "avatarUrl",
+      customAttributes: {},
+    );
 
     setUpAll(() {
       return Future(() async {
@@ -33,16 +34,18 @@ void main() {
       return Future(() async {
         mockUserBox = await Hive.openBox(ChatwootUserBoxNames.USERS.toString());
         mockClientInstanceKeyToUserBox = await Hive.openBox(
-            ChatwootUserBoxNames.CLIENT_INSTANCE_TO_USER.toString());
+          ChatwootUserBoxNames.CLIENT_INSTANCE_TO_USER.toString(),
+        );
 
         dao = PersistedChatwootUserDao(
-            mockUserBox, mockClientInstanceKeyToUserBox, testClientInstanceKey);
+          mockUserBox,
+          mockClientInstanceKeyToUserBox,
+          testClientInstanceKey,
+        );
       });
     });
 
-    test(
-        'Given user is successfully deleted when deleteUser is called, then getUser should return null',
-        () async {
+    test('Given user is successfully deleted when deleteUser is called, then getUser should return null', () async {
       //GIVEN
       await dao.saveUser(testUser);
 
@@ -53,9 +56,7 @@ void main() {
       expect(dao.getUser(), null);
     });
 
-    test(
-        'Given user is successfully save when saveUser is called, then getUser should return saved user',
-        () async {
+    test('Given user is successfully save when saveUser is called, then getUser should return saved user', () async {
       //WHEN
       await dao.saveUser(testUser);
 
@@ -63,9 +64,7 @@ void main() {
       expect(dao.getUser(), testUser);
     });
 
-    test(
-        'Given user is successfully retrieved when getUser is called, then retrieved user should not be null',
-        () async {
+    test('Given user is successfully retrieved when getUser is called, then retrieved user should not be null', () async {
       //GIVEN
       await dao.saveUser(testUser);
 
@@ -76,9 +75,7 @@ void main() {
       expect(retrievedUser, testUser);
     });
 
-    test(
-        'Given users are successfully cleared when clearAll is called, then retrieving a user should be null',
-        () async {
+    test('Given users are successfully cleared when clearAll is called, then retrieving a user should be null', () async {
       //GIVEN
       await dao.saveUser(testUser);
 

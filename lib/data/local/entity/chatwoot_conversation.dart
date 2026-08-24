@@ -2,7 +2,7 @@ import 'package:chatwoot_sdk/chatwoot_sdk.dart';
 import 'package:chatwoot_sdk/data/local/entity/chatwoot_contact.dart';
 import 'package:chatwoot_sdk/data/local/local_storage.dart';
 import 'package:equatable/equatable.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'chatwoot_conversation.g.dart';
 
@@ -29,11 +29,12 @@ class ChatwootConversation extends Equatable {
   @HiveField(3)
   final ChatwootContact contact;
 
-  ChatwootConversation(
-      {required this.id,
-      required this.inboxId,
-      required this.messages,
-      required this.contact});
+  ChatwootConversation({
+    required this.id,
+    required this.inboxId,
+    required this.messages,
+    required this.contact,
+  });
 
   factory ChatwootConversation.fromJson(Map<String, dynamic> json) =>
       _$ChatwootConversationFromJson(json);

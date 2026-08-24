@@ -24,8 +24,11 @@ String getMessage(String data) {
   return data.replaceAll(WOOT_PREFIX, '');
 }
 
-String generateScripts(
-    {ChatwootUser? user, String? locale, dynamic customAttributes}) {
+String generateScripts({
+  ChatwootUser? user,
+  String? locale,
+  dynamic customAttributes,
+}) {
   String script = '';
   if (user != null) {
     final userObject = {
@@ -38,7 +41,7 @@ String generateScripts(
   if (locale != null) {
     final localeObject = {
       "event": PostMessageEvents.SET_LOCALE,
-      "locale": locale
+      "locale": locale,
     };
     script += createWootPostMessage(localeObject);
   }
@@ -52,9 +55,7 @@ String generateScripts(
   return script;
 }
 
-const _androidOptions = AndroidOptions(
-  encryptedSharedPreferences: true,
-);
+const _androidOptions = AndroidOptions();
 final secureStorage = new FlutterSecureStorage(aOptions: _androidOptions);
 const cookieKey = 'cwCookie';
 

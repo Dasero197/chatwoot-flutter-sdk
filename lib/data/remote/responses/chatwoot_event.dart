@@ -1,7 +1,7 @@
 import 'package:chatwoot_sdk/chatwoot_sdk.dart';
 import 'package:chatwoot_sdk/data/local/local_storage.dart';
 import 'package:equatable/equatable.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'chatwoot_event.g.dart';
@@ -115,27 +115,28 @@ class ChatwootEventMessageData {
   @JsonKey()
   final dynamic users;
 
-  ChatwootEventMessageData(
-      {this.id,
-      this.user,
-      this.conversation,
-      this.echoId,
-      this.sender,
-      this.conversationId,
-      this.createdAt,
-      this.contentAttributes,
-      this.contentType,
-      this.messageType,
-      this.content,
-      this.inboxId,
-      this.sourceId,
-      this.updatedAt,
-      this.status,
-      this.accountId,
-      this.externalSourceIds,
-      this.private,
-      this.senderId,
-      this.users});
+  ChatwootEventMessageData({
+    this.id,
+    this.user,
+    this.conversation,
+    this.echoId,
+    this.sender,
+    this.conversationId,
+    this.createdAt,
+    this.contentAttributes,
+    this.contentType,
+    this.messageType,
+    this.content,
+    this.inboxId,
+    this.sourceId,
+    this.updatedAt,
+    this.status,
+    this.accountId,
+    this.externalSourceIds,
+    this.private,
+    this.senderId,
+    this.users,
+  });
 
   factory ChatwootEventMessageData.fromJson(Map<String, dynamic> json) =>
       _$ChatwootEventMessageDataFromJson(json);
@@ -167,8 +168,12 @@ class ChatwootEventMessageUser extends Equatable {
   @HiveField(3)
   final String? thumbnail;
 
-  ChatwootEventMessageUser(
-      {this.id, this.avatarUrl, this.name, this.thumbnail});
+  ChatwootEventMessageUser({
+    this.id,
+    this.avatarUrl,
+    this.name,
+    this.thumbnail,
+  });
 
   factory ChatwootEventMessageUser.fromJson(Map<String, dynamic> json) =>
       _$ChatwootEventMessageUserFromJson(json);
@@ -204,7 +209,7 @@ enum ChatwootEventMessageType {
   message_updated,
   conversation_typing_off,
   conversation_typing_on,
-  conversation_status_changed
+  conversation_status_changed,
 }
 
 String? eventMessageTypeToJson(ChatwootEventMessageType? actionType) {
@@ -223,9 +228,7 @@ String? eventMessageTypeToJson(ChatwootEventMessageType? actionType) {
       return "message.updated";
     case ChatwootEventMessageType.conversation_status_changed:
       return "conversation.status_changed";
-    default:
-      return actionType.toString();
-  }
+    }
 }
 
 ChatwootEventMessageType? eventMessageTypeFromJson(String? value) {

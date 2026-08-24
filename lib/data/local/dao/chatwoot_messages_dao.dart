@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:chatwoot_sdk/data/local/entity/chatwoot_message.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce/hive.dart';
 
 abstract class ChatwootMessagesDao {
   Future<void> saveMessage(ChatwootMessage message);
@@ -27,15 +27,18 @@ class PersistedChatwootMessagesDao extends ChatwootMessagesDao {
   //box with one to many relation
   final Box<String> _messageIdToClientInstanceKeyBox;
 
-  PersistedChatwootMessagesDao(this._box, this._messageIdToClientInstanceKeyBox,
-      this._clientInstanceKey);
+  PersistedChatwootMessagesDao(
+    this._box,
+    this._messageIdToClientInstanceKeyBox,
+    this._clientInstanceKey,
+  );
 
   @override
   Future<void> clear() async {
     //filter current client instance message ids
     Iterable clientMessageIds = _messageIdToClientInstanceKeyBox.keys.where(
-        (key) =>
-            _messageIdToClientInstanceKeyBox.get(key) == _clientInstanceKey);
+      (key) => _messageIdToClientInstanceKeyBox.get(key) == _clientInstanceKey,
+    );
 
     await _box.deleteAll(clientMessageIds);
     await _messageIdToClientInstanceKeyBox.deleteAll(clientMessageIds);
@@ -60,9 +63,11 @@ class PersistedChatwootMessagesDao extends ChatwootMessagesDao {
     //filter current client instance message ids
     Set<int> clientMessageIds = _messageIdToClientInstanceKeyBox.keys
         .map((e) => e as int)
-        .where((key) =>
-            _messageIdToClientInstanceKeyBox.get(key) ==
-            messageClientInstancekey)
+        .where(
+          (key) =>
+              _messageIdToClientInstanceKeyBox.get(key) ==
+              messageClientInstancekey,
+        )
         .toSet();
 
     //retrieve messages with ids
@@ -100,9 +105,11 @@ class PersistedChatwootMessagesDao extends ChatwootMessagesDao {
 
   static Future<void> openDB() async {
     await Hive.openBox<ChatwootMessage>(
-        ChatwootMessagesBoxNames.MESSAGES.toString());
+      ChatwootMessagesBoxNames.MESSAGES.toString(),
+    );
     await Hive.openBox<String>(
-        ChatwootMessagesBoxNames.MESSAGES_TO_CLIENT_INSTANCE_KEY.toString());
+      ChatwootMessagesBoxNames.MESSAGES_TO_CLIENT_INSTANCE_KEY.toString(),
+    );
   }
 }
 
@@ -126,8 +133,9 @@ class NonPersistedChatwootMessagesDao extends ChatwootMessagesDao {
 
   @override
   List<ChatwootMessage> getMessages() {
-    List<ChatwootMessage> sortedMessages =
-        _messages.values.toList(growable: false);
+    List<ChatwootMessage> sortedMessages = _messages.values.toList(
+      growable: false,
+    );
     sortedMessages.sort((a, b) {
       return a.createdAt.compareTo(b.createdAt);
     });
